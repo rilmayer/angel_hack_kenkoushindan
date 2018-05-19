@@ -23,7 +23,7 @@ DETECTION_TYPES = [
 ]
 
 
-def generate_infiletxt(path_to_image=BASE_DIR+'images/google.jpg', infiletxt_path=BASE_DIR+'data/visioninfile.txt'):
+def generate_infiletxt(path_to_image=BASE_DIR+'images/checkup.jpg', infiletxt_path=BASE_DIR+'data/visioninfile.txt'):
     """ Generate infiletxt to be requested Cloud Vision API.
     Args:
         path_to_image: string. Path to image.
@@ -44,8 +44,8 @@ def generate_json(input_filename=BASE_DIR+'data/visioninfile.txt', output_filena
         output_filename: the name of the file to output the json to.
             ex) /Users/username/workspace/vision.json
     """
-    with open(input_filename, 'r') as input_file:
-        print(input_file)
+    # with open(input_filename, 'r') as input_file:
+        # print(input_file)
         # Collect all requests into an array - one per line in the input file
         request_list = []
         for line in input_file:
@@ -125,3 +125,35 @@ def get_response(json_file_path=BASE_DIR+'data/vision.json'):
     response = requests.post(url=url, data=data, headers={'Content-Type': 'application/json'})
 
     return response
+
+
+def generate_json_from_base64_image(base64_image):
+    """ Translates the input file into a json text.
+    Args:
+        base64_image: string. base64-encoded image.
+    Returns:
+        request_json: string. request json .
+    """
+    # Content image
+    content_json_obj = {'content': base64_image.decode('UTF-8')}
+
+    # Detection type.
+    feature_json_obj = []
+    detection_type = 5
+    max_results = 30
+    feature_json_obj = feature_json_obj.append({
+                            'type': get_detection_type(detection_type),
+                            'maxResults': max_results
+                       })
+
+    # Now add it to the request
+    request_list = []
+    request_list.append({
+        'features': feature_json_obj,
+        'image': content_json_obj,
+    })
+
+    # To request json
+    request_json = json.dumps({'requests': request_list})
+
+    return request_json
