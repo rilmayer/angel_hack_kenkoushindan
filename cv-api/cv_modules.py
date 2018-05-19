@@ -9,7 +9,8 @@ import os
 API_KEY = os.getenv("DR_MEDICAL_CHECKUP_API_KEY", "api key not exist")
 print(API_KEY)
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = '/Users/k_kitahara/workspace/angel_hack_kenkoushindan/'
 
 DETECTION_TYPES = [
     'TYPE_UNSPECIFIED',
@@ -22,7 +23,7 @@ DETECTION_TYPES = [
 ]
 
 
-def generate_infiletxt(path_to_image='/Users/k_kitahara/workspace/dr_mdical_checkup/checkup.jpg', infiletxt_path='/Users/k_kitahara/workspace/dr_mdical_checkup/visioninfile.txt'):
+def generate_infiletxt(path_to_image=BASE_DIR+'/data/google.jpg', infiletxt_path=BASE_DIR+'/data/visioninfile.txt'):
     """ Generate infiletxt to be requested Cloud Vision API.
     Args:
         path_to_image: string. Path to image.
@@ -35,7 +36,7 @@ def generate_infiletxt(path_to_image='/Users/k_kitahara/workspace/dr_mdical_chec
         f.write(str)
 
 
-def generate_json(input_filename='/Users/k_kitahara/workspace/dr_mdical_checkup/visioninfile.txt', output_filename='/Users/k_kitahara/workspace/dr_mdical_checkup/vision.json'):
+def generate_json(input_filename=BASE_DIR+'/data/visioninfile.txt', output_filename=BASE_DIR+'/data/vision.json'):
     """ Translates the input file into a json output file.
     Args:
         input_filename: a file object, containing lines of input to convert.
@@ -110,7 +111,7 @@ The valid values - and their corresponding meanings - for
         for i, detection_type in enumerate(DETECTION_TYPES[1:])))
 
 
-def get_response(json_file_path='/Users/k_kitahara/workspace/dr_mdical_checkup/vision.json'):
+def get_response(json_file_path=BASE_DIR+'/data/vision.json'):
     """ Get response from Cloud Vision API.
     Args:
         json_file_path: string. json data including image info.
