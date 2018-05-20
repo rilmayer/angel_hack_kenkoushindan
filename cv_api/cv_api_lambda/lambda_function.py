@@ -2,7 +2,6 @@
 import requests
 import json
 import os
-import re
 
 API_KEY = os.getenv("DR_MEDICAL_CHECKUP_API_KEY", "api key not exist")
 
@@ -18,16 +17,31 @@ DETECTION_TYPES = [
 
 
 def lambda_handler(event, context):
+    """ Entry point of Lambda function.
+    Args:
+        event: HTTP request.
+    Returns:
+        advice: string. Advice for the medical checkup image.
+    """
+    # Generate json from base64-encoded image.
     data = generate_json_from_base64_image(event['image'])
-    response = get_response_from_cv_api(data)
-    text_result = json.loads(response.text)
-    description = text_result['responses'][0]['textAnnotations'][0]['description']
-    parsed = parse_description(description)
-    advice = generate_advice(parsed)
-    return advice
 
-    # res_sapmple = 'コレステロールが高そうです'
-    # return res_sapmple
+    # Get response from Cloud Vision API
+    response = get_response_from_cv_api(data)
+
+    # Load response text as json.
+    text_result = json.loads(response.text)
+
+    # Extract description.
+    description = text_result['responses'][0]['textAnnotations'][0]['description']
+
+    # Parse description
+    parsed = parse_description(description)
+
+    # Generate advice.
+    advice = generate_advice(parsed)
+
+    return advice
 
 
 def generate_json_from_base64_image(base64_image):
@@ -134,8 +148,6 @@ def generate_advice(parsed):
     if reformed_item == 'HDL.C' and l_bound <= act and act <= h_bound:
         advice = '問題ありません'
     elif reformed_item == 'HDL.C' and l_bound >= act:
-        advice = """HDL.Cが基準値を下回っています（基準値: {} - {}, あなたの値: {}）。\n【結果の解釈】\nHDLコレステロールは善玉コレステロールと呼ばれ、血管内の脂質を回収する役割があります。HDLコレステロールが低いと、血管内に脂肪が増え、動脈硬化などを引き起こします。\n【改善策】\n薬ではなく、まずは運動と食事を改善します。運動とは、例えば週に2,3日に30分運動する時間を設けることが推奨されます。食事は油物を避けることが勧められます。\n【今後の方針】\n運動・食事習慣を改善して半年〜1年後に再度検査を行い、HDLコレステロールが改善していないようであれば医療機関での詳しい検査を勧めます。\n【先生から一言】\nそこまで心配する必要はないので安心してください。\n
-        """.format(l_bound, h_bound, act)
-    # print(advice)
+        advice = "HDL.Cが基準値を下回っています（基準値: {} - {}, あなたの値: {}）。\n【結果の解釈】\nHDLコレステロールは善玉コレステロールと呼ばれ、血管内の脂質を回収する役割があります。HDLコレステロールが低いと、血管内に脂肪が増え、動脈硬化などを引き起こします。\n【改善策】\n薬ではなく、まずは運動と食事を改善します。運動とは、例えば週に2,3日に30分運動する時間を設けることが推奨されます。食事は油物を避けることが勧められます。\n【今後の方針】\n運動・食事習慣を改善して半年〜1年後に再度検査を行い、HDLコレステロールが改善していないようであれば医療機関での詳しい検査を勧めます。\n【先生から一言】\nそこまで心配する必要はないので安心してください。\n".format(l_bound, h_bound, act)
     return advice
 
